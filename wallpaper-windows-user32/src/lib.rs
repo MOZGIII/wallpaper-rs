@@ -12,6 +12,16 @@ use winapi::um::winuser::{
 
 type Result<T> = std::result::Result<T, std::io::Error>;
 
+/// Set desktop image.
+///
+/// ```no_run
+/// use wallpaper_windows_user32::set;
+/// use std::path::{Path, PathBuf};
+///
+/// let path = Path::new(r#"C:\Users\User\AppData\Local\Temp\qwerty.jpg"#);
+/// let result = set(path.as_os_str());
+/// assert!(result.is_ok())
+/// ```
 pub fn set(full_path: &OsStr) -> Result<()> {
     let mut full_path_vec: Vec<u16> = proper_to_wide(full_path);
     let ret = unsafe {
@@ -28,6 +38,16 @@ pub fn set(full_path: &OsStr) -> Result<()> {
     }
 }
 
+/// Get desktop image.
+///
+/// ```no_run
+/// use wallpaper_windows_user32::get;
+/// use std::path::{Path, PathBuf};
+///
+/// let wallpaper_os_str = get().unwrap();
+/// let wallpaper_path: PathBuf = wallpaper_os_str.into();
+/// assert_eq!(Path::new(r#"C:\Users\User\AppData\Local\Temp\qwerty.jpg"#), wallpaper_path)
+/// ```
 pub fn get() -> Result<OsString> {
     let mut full_path_vec = [0 as WCHAR; MAX_PATH];
     let ret = unsafe {
