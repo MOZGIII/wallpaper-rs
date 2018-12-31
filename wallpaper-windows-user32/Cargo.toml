@@ -1,6 +1,6 @@
 [package]
 name = "wallpaper-windows-user32"
-version = "0.1.2"
+version = "0.2.0"
 authors = ["MOZGIII <mike-n@narod.ru>"]
 edition = "2018"
 description = "Manipulate Windows desktop image via user32.dll."
