@@ -13,7 +13,7 @@ use winapi::um::winuser::{
 type Result<T> = std::result::Result<T, std::io::Error>;
 
 pub fn set(full_path: &OsStr) -> Result<()> {
-    let mut full_path_vec: Vec<u16> = full_path.encode_wide().chain(once(0)).collect();
+    let mut full_path_vec: Vec<u16> = proper_to_wide(full_path);
     let ret = unsafe {
         SystemParametersInfoW(
             SPI_SETDESKWALLPAPER,
@@ -39,7 +39,17 @@ pub fn get() -> Result<OsString> {
         )
     };
     match ret {
-        TRUE => Ok(OsString::from_wide(&full_path_vec)),
+        TRUE => Ok(proper_from_wide(&full_path_vec)),
         _ => Err(Error::last_os_error().into()),
     }
+}
+
+fn proper_to_wide(s: &OsStr) -> Vec<u16> {
+    s.encode_wide().chain(once(0)).collect::<Vec<_>>()
+}
+
+fn proper_from_wide(s: &[u16]) -> OsString {
+    // Panic if there's no null terminator.
+    let pos = s.iter().position(|a| *a == 0).unwrap();
+    OsString::from_wide(&s[..pos])
 }
