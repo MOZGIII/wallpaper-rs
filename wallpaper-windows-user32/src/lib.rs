@@ -70,6 +70,6 @@ fn proper_to_wide(s: &OsStr) -> Vec<u16> {
 
 fn proper_from_wide(s: &[u16]) -> OsString {
     // Panic if there's no null terminator.
-    let pos = s.iter().position(|a| *a == 0).unwrap();
+    let pos = s.iter().position(|&a| a == 0).unwrap();
     OsString::from_wide(&s[..pos])
 }
