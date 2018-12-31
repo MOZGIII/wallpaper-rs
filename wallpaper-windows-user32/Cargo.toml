@@ -7,6 +7,8 @@ description = "Manipulate Windows desktop image via user32.dll."
 keywords = ["windows", "wallpaper"]
 categories = ["os::windows-apis"]
 license = "MIT"
+repository = "https://github.com/MOZGIII/wallpaper-rs"
+documentation = "https://docs.rs/crate/wallpaper-windows-user32"
 
 [dependencies]
 winapi = { version = "0.3", features = ["winuser"] }
