@@ -1,0 +1,11 @@
+[package]
+name = "wallpaper-windows-user32"
+version = "0.1.0"
+authors = ["MOZGIII <mike-n@narod.ru>"]
+edition = "2018"
+description = "Manipulate Windows desktop image via user32.dll."
+keywords = ["windows", "wallpaper"]
+categories = ["os::windows-apis"]
+
+[dependencies]
+winapi = { version = "0.3", features = ["winuser"] }
