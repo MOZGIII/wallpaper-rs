@@ -22,8 +22,8 @@ type Result<T> = std::result::Result<T, std::io::Error>;
 /// let result = set(path.as_os_str());
 /// assert!(result.is_ok())
 /// ```
-pub fn set(full_path: &OsStr) -> Result<()> {
-    let mut full_path_vec: Vec<u16> = proper_to_wide(full_path);
+pub fn set<T: AsRef<OsStr>>(full_path: T) -> Result<()> {
+    let mut full_path_vec: Vec<u16> = proper_to_wide(full_path.as_ref());
     let ret = unsafe {
         SystemParametersInfoW(
             SPI_SETDESKWALLPAPER,
