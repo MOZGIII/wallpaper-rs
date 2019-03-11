@@ -4,7 +4,7 @@ use std::iter::once;
 use std::os::windows::prelude::*;
 
 use winapi::shared::minwindef::{MAX_PATH, TRUE, UINT};
-use winapi::um::winnt::{PVOID, WCHAR};
+use winapi::um::winnt::{HRESULT, PVOID, WCHAR};
 use winapi::um::winuser::{
     SystemParametersInfoW, SPIF_SENDCHANGE, SPIF_UPDATEINIFILE, SPI_GETDESKWALLPAPER,
     SPI_SETDESKWALLPAPER,
@@ -32,10 +32,8 @@ pub fn set<T: AsRef<OsStr>>(full_path: T) -> Result<()> {
             SPIF_SENDCHANGE | SPIF_UPDATEINIFILE,
         )
     };
-    match ret {
-        TRUE => Ok(()),
-        _ => Err(Error::last_os_error().into()),
-    }
+    check_result(ret)?;
+    Ok(())
 }
 
 /// Get desktop image.
@@ -58,10 +56,8 @@ pub fn get() -> Result<OsString> {
             0,
         )
     };
-    match ret {
-        TRUE => Ok(proper_from_wide(&full_path_vec)),
-        _ => Err(Error::last_os_error().into()),
-    }
+    check_result(ret)?;
+    Ok(proper_from_wide(&full_path_vec))
 }
 
 fn proper_to_wide(s: &OsStr) -> Vec<u16> {
@@ -72,4 +68,11 @@ fn proper_from_wide(s: &[u16]) -> OsString {
     // Panic if there's no null terminator.
     let pos = s.iter().position(|&a| a == 0).unwrap();
     OsString::from_wide(&s[..pos])
+}
+
+fn check_result(result: HRESULT) -> Result<()> {
+    match result {
+        TRUE => Ok(()),
+        _ => Err(Error::from_raw_os_error(result)),
+    }
 }
