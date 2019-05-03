@@ -1,7 +1,7 @@
 mod com;
 mod error;
 
-pub use com::desktop_wallpaper::DesktopWallpaper;
+pub use com::desktop_wallpaper::{DesktopWallpaper, MonID, MonitorID};
 pub use error::Error;
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -20,6 +20,8 @@ mod singleton {
             Mutex::new(DesktopWallpaper::new().unwrap());
     }
 
+    /// Provides access to the singleton `DesktopWallpaper`.
+    /// Only available if the `singleton` feature is enabled.
     pub fn desktop_wallpaper() -> &'static Mutex<DesktopWallpaper> {
         &DESKTOP_WALLPAPER
     }

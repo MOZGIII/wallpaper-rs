@@ -16,6 +16,7 @@ use winapi::um::shobjidl_core::{
 use winapi::um::winnt::{LPCWSTR, LPWSTR};
 use winapi::Interface;
 
+/// Provides access to the IDesktopWallpaper COM interface.
 pub struct DesktopWallpaper(*mut IDesktopWallpaper);
 
 // We initialize COM locally per-thread, but we only have to initialize it in
@@ -32,8 +33,8 @@ impl Drop for DesktopWallpaper {
     }
 }
 
-type MonitorID = OsString;
-type MonID = OsStr;
+pub type MonitorID = OsString;
+pub type MonID = OsStr;
 
 impl DesktopWallpaper {
     /// Creates a DesktopWallpaper backed by a COM object.
@@ -59,8 +60,8 @@ impl DesktopWallpaper {
         }
     }
 
-    // Sets the desktop wallpaper.
-    // If `monitor_id` is `None` sets the wallpaper on all monitors.
+    /// Sets the desktop wallpaper.
+    /// If `monitor_id` is `None` sets the wallpaper on all monitors.
     pub fn set_wallpaper<MID, WP>(&mut self, monitor_id: Option<MID>, wallpaper: WP) -> Result<()>
     where
         MID: AsRef<MonID>,
@@ -82,16 +83,16 @@ impl DesktopWallpaper {
         })
     }
 
-    // Gets the current desktop wallpaper.
-    //
-    // The `monitor_id` can be `None`. In that case, if a single wallpaper image
-    // is displayed on all of the system's monitors, the method returns
-    // successfully. If `monitor_id` is set to `None` and different monitors are
-    // displaying different wallpapers or a slideshow is running, the method
-    // returns an error with `S_FALSE` `Error::IOError`.
-    //
-    // The resulting PathBuf can will be empty if no wallpaper image is being
-    // displayed or if a monitor is displaying a solid color.
+    /// Gets the current desktop wallpaper.
+    ///
+    /// The `monitor_id` can be `None`. In that case, if a single wallpaper
+    /// image is displayed on all of the system's monitors, the method returns
+    /// successfully. If `monitor_id` is set to `None` and different monitors
+    /// are displaying different wallpapers or a slideshow is running, the
+    /// method returns an error with `S_FALSE` `Error::IOError`.
+    ///
+    /// The resulting `PathBuf` can will be empty if no wallpaper image is being
+    /// displayed or if a monitor is displaying a solid color.
     pub fn get_wallpaper<MID>(&mut self, monitor_id: Option<MID>) -> Result<PathBuf>
     where
         MID: AsRef<MonID>,
@@ -115,11 +116,11 @@ impl DesktopWallpaper {
         }
     }
 
-    // Retrieves the unique ID of one of the system's monitors.
-    //
-    // This method can be called on monitors that are currently detached but
-    // that have an image assigned to them. Call get_monitor_rect to distinguish
-    // between attached and detached monitors.
+    /// Retrieves the unique ID of one of the system's monitors.
+    ///
+    /// This method can be called on monitors that are currently detached but
+    /// that have an image assigned to them. Call `get_monitor_rect` to
+    /// distinguish between attached and detached monitors.
     pub fn get_monitor_device_path_at(&mut self, monitor_index: UINT) -> Result<MonitorID> {
         unsafe {
             let mut monitor_id_buf_ptr: LPWSTR = ptr::null_mut();
@@ -130,19 +131,19 @@ impl DesktopWallpaper {
         }
     }
 
-    // Retrieves the number of monitors that are associated with the system.
-    //
-    // The count retrieved through this method includes monitors that are
-    // currently detached but that have an image assigned to them.
-    // Call get_monitor_rect to distinguish between attached and detached
-    // monitors.
+    /// Retrieves the number of monitors that are associated with the system.
+    ///
+    /// The count retrieved through this method includes monitors that are
+    /// currently detached but that have an image assigned to them.
+    /// Call `get_monitor_rect` to distinguish between attached and detached
+    /// monitors.
     pub fn get_monitor_device_path_count(&mut self) -> Result<UINT> {
         let mut count: UINT = 0;
         check_result(unsafe { (*self.0).GetMonitorDevicePathCount(&mut count) })?;
         Ok(count)
     }
 
-    // Retrieves the display rectangle of the specified monitor.
+    /// Retrieves the display rectangle of the specified monitor.
     pub fn get_monitor_rect<MID>(&mut self, monitor_id: MID) -> Result<RECT>
     where
         MID: AsRef<MonID>,
@@ -155,17 +156,18 @@ impl DesktopWallpaper {
         }
     }
 
-    // Sets the color that is visible on the desktop when no image is displayed
-    // or when the desktop background has been disabled. This color is also used
-    // as a border when the desktop wallpaper does not fill the entire screen.
+    /// Sets the color that is visible on the desktop when no image is displayed
+    /// or when the desktop background has been disabled. This color is also
+    /// used as a border when the desktop wallpaper does not fill the entire
+    /// screen.
     pub fn set_background_color(&mut self, color: COLORREF) -> Result<()> {
         check_result(unsafe { (*self.0).SetBackgroundColor(color) })
     }
 
-    // Retrieves the color that is visible on the desktop when no image is
-    // displayed or when the desktop background has been disabled. This color
-    // is also used as a border when the desktop wallpaper does not fill the
-    // entire screen.
+    /// Retrieves the color that is visible on the desktop when no image is
+    /// displayed or when the desktop background has been disabled. This color
+    /// is also used as a border when the desktop wallpaper does not fill the
+    /// entire screen.
     pub fn get_background_color(&mut self) -> Result<COLORREF> {
         unsafe {
             let mut color: COLORREF = mem::uninitialized();
@@ -174,13 +176,13 @@ impl DesktopWallpaper {
         }
     }
 
-    // Sets the display option for the desktop wallpaper image, determining
-    // whether the image should be centered, tiled, or stretched.
+    /// Sets the display option for the desktop wallpaper image, determining
+    /// whether the image should be centered, tiled, or stretched.
     pub fn set_position(&mut self, position: DESKTOP_WALLPAPER_POSITION) -> Result<()> {
         check_result(unsafe { (*self.0).SetPosition(position) })
     }
 
-    // Retrieves the current display value for the desktop background image.
+    /// Retrieves the current display value for the desktop background image.
     pub fn get_position(&mut self) -> Result<DESKTOP_WALLPAPER_POSITION> {
         unsafe {
             let mut position: DESKTOP_WALLPAPER_POSITION = mem::uninitialized();
@@ -202,7 +204,7 @@ impl DesktopWallpaper {
     //     items: *mut *mut IShellItemArray,
     // ) -> HRESULT,
 
-    // Sets the desktop wallpaper slideshow settings for shuffle and timing.
+    /// Sets the desktop wallpaper slideshow settings for shuffle and timing.
     pub fn set_slideshow_options(
         &mut self,
         options: DESKTOP_SLIDESHOW_OPTIONS,
@@ -211,8 +213,8 @@ impl DesktopWallpaper {
         check_result(unsafe { (*self.0).SetSlideshowOptions(options, slideshow_tick) })
     }
 
-    // Gets the current desktop wallpaper slideshow settings for shuffle and
-    // timing.
+    /// Gets the current desktop wallpaper slideshow settings for shuffle and
+    /// timing.
     pub fn get_slideshow_options(&mut self) -> Result<(DESKTOP_WALLPAPER_POSITION, UINT)> {
         unsafe {
             let mut options: DESKTOP_SLIDESHOW_OPTIONS = mem::uninitialized();
@@ -222,8 +224,9 @@ impl DesktopWallpaper {
         }
     }
 
-    // Switches the wallpaper on a specified monitor to the next image in the slideshow.
-    // If `monitor_id` is `None`, the monitor scheduled to change next is used.
+    /// Switches the wallpaper on a specified monitor to the next image in the
+    /// slideshow.
+    /// If `monitor_id` is `None`, the monitor scheduled to change next is used.
     pub fn advance_slideshow<MID>(
         &mut self,
         monitor_id: Option<MID>,
@@ -247,7 +250,7 @@ impl DesktopWallpaper {
         })
     }
 
-    // Gets the current status of the slideshow.
+    /// Gets the current status of the slideshow.
     pub fn get_status(&mut self) -> Result<DESKTOP_SLIDESHOW_STATE> {
         unsafe {
             let mut state: DESKTOP_SLIDESHOW_STATE = mem::uninitialized();
@@ -256,14 +259,14 @@ impl DesktopWallpaper {
         }
     }
 
-    // Enables or disables the desktop background.
-    //
-    // This method would normally be called to disable the desktop background
-    // for performance reasons.
-    //
-    // When the desktop background is disabled, a solid color is shown in its
-    // place. To get or set the specific color, use the get_background_color and
-    // set_background_color methods.
+    /// Enables or disables the desktop background.
+    ///
+    /// This method would normally be called to disable the desktop background
+    /// for performance reasons.
+    ///
+    /// When the desktop background is disabled, a solid color is shown in its
+    /// place. To get or set the specific color, use the `get_background_color`
+    /// and `set_background_color` methods.
     pub fn enable(&mut self, enable: bool) -> Result<()> {
         let val: BOOL = if enable { TRUE } else { FALSE };
         check_result(unsafe { (*self.0).Enable(val) })
