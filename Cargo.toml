@@ -2,4 +2,5 @@
 
 members = [
   "wallpaper-windows-user32",
+  "wallpaper-windows-shobjidl",
 ]

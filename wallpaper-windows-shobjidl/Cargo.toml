@@ -1,0 +1,30 @@
+[package]
+name = "wallpaper-windows-shobjidl"
+version = "0.1.0"
+authors = ["MOZGIII <mike-n@narod.ru>"]
+edition = "2018"
+description = "Manipulate Windows desktop image via shell32.dll with shobjidl_core.h API."
+keywords = ["windows", "wallpaper"]
+categories = ["os::windows-apis"]
+license = "MIT"
+repository = "https://github.com/MOZGIII/wallpaper-rs"
+documentation = "https://docs.rs/wallpaper-windows-shobjidl"
+
+[package.metadata.docs.rs]
+default-target = "x86_64-pc-windows-msvc"
+
+[dependencies]
+widestring = "0.4"
+
+[dependencies.winapi]
+git = "https://github.com/AlphaModder/winapi-rs.git"
+rev = "31a24c184435d617e62767999be086e347f133e2"
+features = ["combaseapi", "shobjidl_core", "objbase", "std", "debug", "winerror"]
+
+[dependencies.lazy_static]
+version = "1.3"
+optional = true
+
+[features]
+default = ["singleton"]
+singleton = ["lazy_static"]

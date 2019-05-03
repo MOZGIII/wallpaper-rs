@@ -7,6 +7,10 @@
     {
       "name": "windows-user32",
       "path": "wallpaper-windows-user32"
+    },
+    {
+      "name": "windows-shobjidl",
+      "path": "wallpaper-windows-shobjidl"
     }
   ],
   "settings": {
