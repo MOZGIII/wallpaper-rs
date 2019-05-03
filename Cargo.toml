@@ -1,6 +1,5 @@
 [workspace]
-
 members = [
-  "wallpaper-windows-user32",
-  "wallpaper-windows-shobjidl",
+  "windows-user32",
+  "windows-shobjidl",
 ]

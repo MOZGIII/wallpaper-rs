@@ -6,7 +6,7 @@
     "**/.hg": true,
     "**/CVS": true,
     "**/.DS_Store": true,
-    "wallpaper-windows-user32": true,
-    "wallpaper-windows-shobjidl": true
+    "windows-user32": true,
+    "windows-shobjidl": true
   }
 }
