@@ -1,3 +1,5 @@
+#![warn(rust_2018_idioms)]
+
 use std::path::{Path, PathBuf};
 
 use winapi::shared::minwindef::{MAX_PATH, TRUE, UINT};

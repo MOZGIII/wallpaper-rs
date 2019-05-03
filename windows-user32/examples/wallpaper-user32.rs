@@ -8,7 +8,7 @@ static USAGE: &'static str = r#"Usage:
     wallpaper [path]   - set wallpaper
 "#;
 
-fn main() -> Result<(), Box<error::Error>> {
+fn main() -> Result<(), Box<dyn error::Error>> {
     let args: Vec<_> = env::args().collect();
     match args.len() {
         2 => {
