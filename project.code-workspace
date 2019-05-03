@@ -1,0 +1,15 @@
+{
+  "folders": [
+    {
+      "name": "workspace",
+      "path": "."
+    },
+    {
+      "name": "windows-user32",
+      "path": "wallpaper-windows-user32"
+    }
+  ],
+  "settings": {
+    "editor.formatOnSave": true
+  }
+}
