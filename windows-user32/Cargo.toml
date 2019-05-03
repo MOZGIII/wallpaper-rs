@@ -15,3 +15,4 @@ default-target = "x86_64-pc-windows-msvc"
 
 [dependencies]
 winapi = { version = "0.3", features = ["winuser"] }
+widestring = "0.4"

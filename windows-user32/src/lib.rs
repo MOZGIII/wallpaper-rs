@@ -1,7 +1,4 @@
 use std::ffi::{OsStr, OsString};
-use std::io::Error;
-use std::iter::once;
-use std::os::windows::prelude::*;
 
 use winapi::shared::minwindef::{MAX_PATH, TRUE, UINT};
 use winapi::um::winnt::{HRESULT, PVOID, WCHAR};
@@ -10,7 +7,13 @@ use winapi::um::winuser::{
     SPI_SETDESKWALLPAPER,
 };
 
-type Result<T> = std::result::Result<T, std::io::Error>;
+use widestring::{U16CStr, U16CString};
+
+mod error;
+
+pub use error::Error;
+
+pub type Result<T> = std::result::Result<T, Error>;
 
 /// Set desktop image.
 ///
@@ -23,12 +26,12 @@ type Result<T> = std::result::Result<T, std::io::Error>;
 /// assert!(result.is_ok())
 /// ```
 pub fn set<T: AsRef<OsStr>>(full_path: T) -> Result<()> {
-    let mut full_path_vec: Vec<u16> = proper_to_wide(full_path.as_ref());
+    let full_path: U16CString = U16CString::from_os_str(full_path.as_ref())?;
     let ret = unsafe {
         SystemParametersInfoW(
             SPI_SETDESKWALLPAPER,
             0,
-            full_path_vec.as_mut_ptr() as PVOID,
+            full_path.as_ptr() as PVOID,
             SPIF_SENDCHANGE | SPIF_UPDATEINIFILE,
         )
     };
@@ -47,32 +50,23 @@ pub fn set<T: AsRef<OsStr>>(full_path: T) -> Result<()> {
 /// assert_eq!(Path::new(r#"C:\Users\User\AppData\Local\Temp\qwerty.jpg"#), wallpaper_path)
 /// ```
 pub fn get() -> Result<OsString> {
-    let mut full_path_vec = [0 as WCHAR; MAX_PATH];
+    let mut full_path_buf = [0 as WCHAR; MAX_PATH];
     let ret = unsafe {
         SystemParametersInfoW(
             SPI_GETDESKWALLPAPER,
-            full_path_vec.len() as UINT,
-            full_path_vec.as_mut_ptr() as PVOID,
+            full_path_buf.len() as UINT,
+            full_path_buf.as_mut_ptr() as PVOID,
             0,
         )
     };
     check_result(ret)?;
-    Ok(proper_from_wide(&full_path_vec))
-}
-
-fn proper_to_wide(s: &OsStr) -> Vec<u16> {
-    s.encode_wide().chain(once(0)).collect::<Vec<_>>()
-}
-
-fn proper_from_wide(s: &[u16]) -> OsString {
-    // Panic if there's no null terminator.
-    let pos = s.iter().position(|&a| a == 0).unwrap();
-    OsString::from_wide(&s[..pos])
+    let full_path: &U16CStr = U16CStr::from_slice_with_nul(&full_path_buf)?;
+    Ok(full_path.to_os_string())
 }
 
 fn check_result(result: HRESULT) -> Result<()> {
     match result {
         TRUE => Ok(()),
-        _ => Err(Error::from_raw_os_error(result)),
+        _ => Err(std::io::Error::from_raw_os_error(result))?,
     }
 }

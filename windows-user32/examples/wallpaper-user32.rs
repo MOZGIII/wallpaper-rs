@@ -1,7 +1,7 @@
 use std::env;
 use std::error;
 use std::path::Path;
-use wallpaper_windows_user32::*;
+use wallpaper_windows_user32::{get, set};
 
 static USAGE: &'static str = r#"Usage:
     wallpaper          - get wallpaper
