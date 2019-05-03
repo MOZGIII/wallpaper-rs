@@ -19,6 +19,7 @@ fn main() -> Result<(), Box<error::Error>> {
         1 => {
             let path = get()?;
             let path = path
+                .into_os_string()
                 .into_string()
                 .or(Err("Path is not a valid UTF-8 string"))?;
             println!("{}", path);

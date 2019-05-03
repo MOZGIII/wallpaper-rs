@@ -1,4 +1,4 @@
-use std::ffi::{OsStr, OsString};
+use std::path::{Path, PathBuf};
 
 use winapi::shared::minwindef::{MAX_PATH, TRUE, UINT};
 use winapi::um::winnt::{HRESULT, PVOID, WCHAR};
@@ -22,10 +22,10 @@ pub type Result<T> = std::result::Result<T, Error>;
 /// use std::path::{Path, PathBuf};
 ///
 /// let path = Path::new(r#"C:\Users\User\AppData\Local\Temp\qwerty.jpg"#);
-/// let result = set(path.as_os_str());
+/// let result = set(path);
 /// assert!(result.is_ok())
 /// ```
-pub fn set<T: AsRef<OsStr>>(full_path: T) -> Result<()> {
+pub fn set<T: AsRef<Path>>(full_path: T) -> Result<()> {
     let full_path: U16CString = U16CString::from_os_str(full_path.as_ref())?;
     let ret = unsafe {
         SystemParametersInfoW(
@@ -45,11 +45,10 @@ pub fn set<T: AsRef<OsStr>>(full_path: T) -> Result<()> {
 /// use wallpaper_windows_user32::get;
 /// use std::path::{Path, PathBuf};
 ///
-/// let wallpaper_os_str = get().unwrap();
-/// let wallpaper_path: PathBuf = wallpaper_os_str.into();
+/// let wallpaper_path: PathBuf = get().unwrap();
 /// assert_eq!(Path::new(r#"C:\Users\User\AppData\Local\Temp\qwerty.jpg"#), wallpaper_path)
 /// ```
-pub fn get() -> Result<OsString> {
+pub fn get() -> Result<PathBuf> {
     let mut full_path_buf = [0 as WCHAR; MAX_PATH];
     let ret = unsafe {
         SystemParametersInfoW(
@@ -61,7 +60,7 @@ pub fn get() -> Result<OsString> {
     };
     check_result(ret)?;
     let full_path: &U16CStr = U16CStr::from_slice_with_nul(&full_path_buf)?;
-    Ok(full_path.to_os_string())
+    Ok(full_path.to_os_string().into())
 }
 
 fn check_result(result: HRESULT) -> Result<()> {
