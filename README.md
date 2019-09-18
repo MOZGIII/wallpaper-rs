@@ -1,5 +1,7 @@
 # wallpaper-rs
 
+[![Build status](https://ci.appveyor.com/api/projects/status/90mny46vxj4ko1w7?svg=true)](https://ci.appveyor.com/project/MOZGIII/wallpaper-rs)
+
 The goal of this project is to provide tools for working with desktop images.
 
 The design is to have multiple crates for low-level implementations and a single
