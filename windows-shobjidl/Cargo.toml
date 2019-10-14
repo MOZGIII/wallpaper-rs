@@ -14,7 +14,7 @@ documentation = "https://docs.rs/wallpaper-windows-shobjidl"
 default-target = "x86_64-pc-windows-msvc"
 
 [dependencies]
-winapi = { version = "0.3", features = ["combaseapi", "shobjidl_core", "objbase", "std", "debug", "winerror"] }
+winapi = { git = "https://github.com/retep998/winapi-rs", rev = "b67cb33fa86dba4fb025a339341521660332751d", features = ["combaseapi", "shobjidl_core", "objbase", "std", "debug", "winerror"] }
 widestring = "0.4"
 
 [dependencies.lazy_static]
