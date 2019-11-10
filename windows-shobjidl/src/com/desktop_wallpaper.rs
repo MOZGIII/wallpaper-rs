@@ -2,7 +2,7 @@ use super::helpers::*;
 use super::init::ensure_com_initialized;
 use crate::Result;
 use std::ffi::{OsStr, OsString};
-use std::mem;
+use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
 use std::ptr;
 use widestring::U16CString;
@@ -149,10 +149,10 @@ impl DesktopWallpaper {
         MID: AsRef<MonID>,
     {
         let monitor_id: U16CString = U16CString::from_os_str(monitor_id.as_ref())?;
+        let mut display_rect = MaybeUninit::<RECT>::uninit();
         unsafe {
-            let mut display_rect: RECT = mem::uninitialized();
-            check_result((*self.0).GetMonitorRECT(monitor_id.as_ptr(), &mut display_rect))?;
-            Ok(display_rect)
+            check_result((*self.0).GetMonitorRECT(monitor_id.as_ptr(), display_rect.as_mut_ptr()))?;
+            Ok(display_rect.assume_init())
         }
     }
 
@@ -169,10 +169,10 @@ impl DesktopWallpaper {
     /// is also used as a border when the desktop wallpaper does not fill the
     /// entire screen.
     pub fn get_background_color(&mut self) -> Result<COLORREF> {
+        let mut color = MaybeUninit::<COLORREF>::uninit();
         unsafe {
-            let mut color: COLORREF = mem::uninitialized();
-            check_result((*self.0).GetBackgroundColor(&mut color))?;
-            Ok(color)
+            check_result((*self.0).GetBackgroundColor(color.as_mut_ptr()))?;
+            Ok(color.assume_init())
         }
     }
 
@@ -184,10 +184,10 @@ impl DesktopWallpaper {
 
     /// Retrieves the current display value for the desktop background image.
     pub fn get_position(&mut self) -> Result<DESKTOP_WALLPAPER_POSITION> {
+        let mut position = MaybeUninit::<DESKTOP_WALLPAPER_POSITION>::uninit();
         unsafe {
-            let mut position: DESKTOP_WALLPAPER_POSITION = mem::uninitialized();
-            check_result((*self.0).GetPosition(&mut position))?;
-            Ok(position)
+            check_result((*self.0).GetPosition(position.as_mut_ptr()))?;
+            Ok(position.assume_init())
         }
     }
 
@@ -216,11 +216,13 @@ impl DesktopWallpaper {
     /// Gets the current desktop wallpaper slideshow settings for shuffle and
     /// timing.
     pub fn get_slideshow_options(&mut self) -> Result<(DESKTOP_WALLPAPER_POSITION, UINT)> {
+        let mut options = MaybeUninit::<DESKTOP_SLIDESHOW_OPTIONS>::uninit();
+        let mut slideshow_tick = MaybeUninit::<UINT>::uninit();
         unsafe {
-            let mut options: DESKTOP_SLIDESHOW_OPTIONS = mem::uninitialized();
-            let mut slideshow_tick: UINT = mem::uninitialized();
-            check_result((*self.0).GetSlideshowOptions(&mut options, &mut slideshow_tick))?;
-            Ok((options, slideshow_tick))
+            check_result(
+                (*self.0).GetSlideshowOptions(options.as_mut_ptr(), slideshow_tick.as_mut_ptr()),
+            )?;
+            Ok((options.assume_init(), slideshow_tick.assume_init()))
         }
     }
 
@@ -252,10 +254,10 @@ impl DesktopWallpaper {
 
     /// Gets the current status of the slideshow.
     pub fn get_status(&mut self) -> Result<DESKTOP_SLIDESHOW_STATE> {
+        let mut state = MaybeUninit::<DESKTOP_SLIDESHOW_STATE>::uninit();
         unsafe {
-            let mut state: DESKTOP_SLIDESHOW_STATE = mem::uninitialized();
-            check_result((*self.0).GetStatus(&mut state))?;
-            Ok(state)
+            check_result((*self.0).GetStatus(state.as_mut_ptr()))?;
+            Ok(state.assume_init())
         }
     }
 
