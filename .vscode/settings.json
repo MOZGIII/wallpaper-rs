@@ -5,8 +5,6 @@
     "**/.svn": true,
     "**/.hg": true,
     "**/CVS": true,
-    "**/.DS_Store": true,
-    "windows-user32": true,
-    "windows-shobjidl": true
+    "**/.DS_Store": true
   }
 }
