@@ -9,18 +9,13 @@ pub use error::Error;
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[cfg(feature = "singleton")]
-#[macro_use]
-extern crate lazy_static;
-
-#[cfg(feature = "singleton")]
 mod singleton {
     use crate::DesktopWallpaper;
+    use once_cell::sync::Lazy;
     use std::sync::Mutex;
 
-    lazy_static! {
-        static ref DESKTOP_WALLPAPER: Mutex<DesktopWallpaper> =
-            Mutex::new(DesktopWallpaper::new().unwrap());
-    }
+    static DESKTOP_WALLPAPER: Lazy<Mutex<DesktopWallpaper>> =
+        Lazy::new(|| Mutex::new(DesktopWallpaper::new().unwrap()));
 
     /// Provides access to the singleton `DesktopWallpaper`.
     /// Only available if the `singleton` feature is enabled.
